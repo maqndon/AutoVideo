@@ -5,14 +5,18 @@ Script para automatizar la descarga de subtítulos, metadatos y conversión de a
 
 Desde un terminal
 
-para darle permisos de ejecución
+darle permisos de ejecución
 
-chmod +x autovideo.sh
+**chmod +x autovideo.sh**
 
 para ejecutar el script
 
-./autovideo.sh /directorio/en/donde/estan/los/videos/
+**./autovideo.sh /directorio/en/donde/estan/los/videos/**
 
 Ejemplo:
 
-./autovideo.sh /Users/arnoldo/Movies/
+**./autovideo.sh /Users/arnoldo/Movies/**
+
+## Debug
+
+Puede leer el archivo video.log que se crea en el directorio en donde tenga el script para ver algún error que pudiera estar ocurriendo o simplemente ver si todos los archivos fueron convertidos correctamente. 
