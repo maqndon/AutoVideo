@@ -1,6 +1,22 @@
 # AutoVideo
 Script para automatizar la descarga de subtítulos, metadatos y conversión de archivos mkv en mp4 para ser vistos en AppleTV
 
+## Requerimientos de Sistema
+
+GNU/Linux
+
+1. ffmpeg
+2. JAva 8
+3. Filebot
+
+Mac OSX
+
+1. ffmpeg
+2. JAva 8
+3. Homebrew
+4. Homebrew-Cask
+5. Filebot
+
 ## Modo de Empleo
 
 Desde un terminal
