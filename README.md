@@ -6,13 +6,13 @@ Script para automatizar la descarga de subtítulos, metadatos y conversión de a
 GNU/Linux
 
 1. ffmpeg
-2. JAva 8
+2. Java 8
 3. Filebot
 
 Mac OSX
 
 1. ffmpeg
-2. JAva 8
+2. Java 8
 3. Homebrew
 4. Homebrew-Cask
 5. Filebot
