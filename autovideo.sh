@@ -221,8 +221,8 @@ function mkvtomp4 {
 		clear
 		let COUNT=COUNT+1
 		echo -e "$COUNT) Convirtiendo ${i%.#*} MKV en MP4 y añadiendo los Subtítulos Descargados"|tee -a video.log
-		#echo -e "ffmpeg -i "${i%.#*}" -i "${i%.*}.$SUBEXT" -c:v copy -c:a copy -c:s mov_text "${i%.*}.$NEWEXT""
-		ffmpeg -i "${i%.#*}" -i "${i%.*}.$SUBEXT" -c:v copy -c:a copy -c:s mov_text "${i%.*}.$NEWEXT"
+		#echo -e "ffmpeg -i "${i%.#*}" -i "${i%.*}.$SUBEXT" -c:v copy -c:a copy -c:s mov_text "${i%.*}.$NEWEXT" < /dev/null"
+		ffmpeg -i "${i%.#*}" -i "${i%.*}.$SUBEXT" -c:v copy -c:a copy -c:s mov_text "${i%.*}.$NEWEXT" < /dev/null
 		pausa
 		#si ocurre algún error con ffmpeg sale del script automáticamente
 		if [ $? == 1 ];then
