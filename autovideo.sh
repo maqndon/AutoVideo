@@ -348,7 +348,9 @@ find "$DIR" -type f -name "$NFO" -print0 | while IFS= read -r -d '' i; do
 
     poster=`xpath "$xml" "//poster/text()" 2> /dev/null`
 
-    curl -o "$DIR$POSTERJPG" "http://thetvdb.com/banners/$poster"
+    portada="$DIR$POSTERJPG"
+
+    curl -o "$portada" "http://thetvdb.com/banners/$poster"
 
 #   creamos un archivo con los metadatos
 
@@ -394,8 +396,7 @@ find "$DIR" -type f -name "$NFO" -print0 | while IFS= read -r -d '' i; do
     hdvideo=1
     echo "hdvideo: $hdvideo" | tee -a "${i%nfo}txt"
 
-    poster="$DIR$POSTERJPG"
-    echo "poster: $poster" | tee -a "${i%nfo}txt"
+    echo "poster: $portada" | tee -a "${i%nfo}txt"
 
     let episodios="$(xpath "$xml" 'count(//Episode)' 2> /dev/null)"
 
@@ -462,7 +463,7 @@ find "$DIR" -type f -name "$FILES" -print0 | while IFS= read -r -d '' i; do
     director=`cat "$meta" |grep director: |sed -e 's/director: //'`
     fecha=`cat "$meta" |grep fecha: |sed -e 's/fecha: //'`
     episode_id=`cat "$meta" |grep episodioId: |sed -e 's/episodioId: //'`
-    poster=`cat "$meta" |grep poster: |sed -e 's/poster: //'`
+    portada=`cat "$meta" |grep poster: |sed -e 's/poster: //'`
 
     #-metadata:s:s:[stream number] language=[language code]
     # -c:a aac -ac 2 -strict -2 #cambio el audio a AAC Stereo
@@ -475,7 +476,7 @@ find "$DIR" -type f -name "$FILES" -print0 | while IFS= read -r -d '' i; do
         -metadata:s:v:0 title="English" \
         "${i%.*}.$NEWEXT" < /dev/null
 
-    SublerCLI -source "${i%.*}.$NEWEXT" -dest "$mp4final" -metadata {"TV Show":"$nombreSerie"}{"Artwork":"$poster"}{"HD Video":"$hdvideo"}{"Media Kind":"$mediakind"}{"TV Episode #":"$episodio"}{"TV Season":"$temporada"}{"Genre":"$genero"}{"Name":"$nombre"}{"Artist":"$nombreSerie"}{"Album Artist":"$nombreSerie"}{"Album":"$nombreSerie"}{"Release Date":"$fecha"}{"TV Network":"$network"}{"TV Episode ID":"$episode_id"}
+SublerCLI -source "${i%.*}.$NEWEXT" -dest "$mp4final" -metadata {"TV Show":"$nombreSerie"}{"Artwork":"$portada"}{"HD Video":"$hdvideo"}{"Media Kind":"$mediakind"}{"TV Episode #":"$episodio"}{"TV Season":"$temporada"}{"Genre":"$genero"}{"Name":"$nombre"}{"Artist":"$nombreSerie"}{"Album Artist":"$nombreSerie"}{"Album":"$nombreSerie"}{"Release Date":"$fecha"}{"TV Network":"$network"}{"TV Episode ID":"$episode_id"}
 done
 
 }
