@@ -325,11 +325,18 @@ find "$DIR" -type f -name "$NFO" -print0 | while IFS= read -r -d '' i; do
     seriename=`xpath "$i" "(//SeriesName)[1]/text()" 2> /dev/null`
 
     #Número de temporada y de episodio
-    NUMTEM=`echo $i |sed -e 's/.* \([0-9]*[0-9]\).*/\1/'`
-    if [ $NUMTEM == '01' ]; then
-        $NUMTEM=`echo $NUMTEM |sed -e 's/0//'`
+    NUMTEM=`echo $(basename "$i") |sed -e 's/\([^0-9]*\)\([0-9]*\).*/\2/'`
+    #NUMTEM=`echo $i |sed -e 's/.* \([0-9]*[0-9]\).*/\1/'`
+    if [ $NUMTEM =~ 0* ]; then
+        NUMTEM=`echo $NUMTEM |sed -e 's/0//'`
+        echo "temporada comienza en 0"
     fi
+
     NUMEPI=`echo $i |sed -e 's/.*\(x..\).*/\1/' -e 's/x//'`
+    if [[ $NUMEPI =~ 0* ]]; then
+        NUMEPI=`echo $NUMEPI |sed -e 's/0//'`
+        echo "eopisodio comienza en 0"
+    fi
 
     #Asignamos título al .zip
     TITULOZIP=`echo $(basename "$i")|sed -e 's/.nfo/.zip/' 2> /dev/null`
@@ -350,7 +357,7 @@ find "$DIR" -type f -name "$NFO" -print0 | while IFS= read -r -d '' i; do
 
     curl -o "$portada" "http://thetvdb.com/banners/$poster"
 
-#   creamos un archivo con los metadatos
+    #creamos un archivo con los metadatos
 
     if [ -f "${i%nfo}txt" ]; then
         rm "${i%nfo}txt"
@@ -419,7 +426,6 @@ find "$DIR" -type f -name "$NFO" -print0 | while IFS= read -r -d '' i; do
                 echo "fecha: $fecha" | tee -a "${i%nfo}txt"
                 episodeid="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Episode['$j']/id/text()" 2> /dev/null`;')"
                 echo "episodioId: $episodeid" | tee -a "${i%nfo}txt"
-                continue
 
             fi
 
