@@ -24,6 +24,9 @@ DIR=$1
 #Descomentar este valor es si se quiere definir directorio de las películas/series directamente en el script
 #DIR="/home/marcel/Vídeos/"
 
+#Directorio en donde esta nuestra carpeta de iTunes
+itunes="$HOME/Music/iTunes/iTunes Media/Automatically Add to iTunes.localized/"
+
 #verificamos de qué Sistema Operativo estamos ejecutando el script
 OS=`uname`
 
@@ -336,7 +339,7 @@ find "$DIR" -type f -name "$NFO" -print0 | while IFS= read -r -d '' i; do
     #Asignamos título al .zip
     TITULOZIP=`echo $(basename "$i")|sed -e 's/.nfo/.zip/' 2> /dev/null`
 
-    xml="$DIR/${TITULOZIP%.*}/$idioma.xml"
+    xml="'$DIR/${TITULOZIP%.*}/$idioma.xml'"
 
     #Asignamos al poster .jpg
     POSTERJPG=`echo $(basename "$i")|sed -e 's/.nfo/.jpg/' 2> /dev/null`
@@ -346,7 +349,8 @@ find "$DIR" -type f -name "$NFO" -print0 | while IFS= read -r -d '' i; do
 
     unzip "$DIR$TITULOZIP" -d "$DIR/${TITULOZIP%.*}"
 
-    poster=`xpath "$xml" "//poster/text()" 2> /dev/null`
+    #poster=`xpath "$xml" "//poster/text()" 2> /dev/null`
+    poster="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";my $serie=`xpath '"$xml"' "//poster/text()" 2> /dev/null`;print $serie')"
 
     portada="$DIR$POSTERJPG"
 
@@ -362,34 +366,41 @@ find "$DIR" -type f -name "$NFO" -print0 | while IFS= read -r -d '' i; do
     fi
 
     #Nombre de la serie
-    nombreSerie=`xpath "$xml" "//SeriesName/text()" 2> /dev/null`
+    #nombreSerie=`xpath "$xml" "//SeriesName/text()" 2> /dev/null`
+    nombreSerie="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";my $serie=`xpath '"$xml"' "//SeriesName/text()" 2> /dev/null`;print $serie')"
     echo "serie: $nombreSerie" | tee "${i%nfo}txt"
 
     #Actores de la serie
-    actores=`xpath "$xml" "//Actors/text()" 2> /dev/null`
+    #actores=`xpath "$xml" "//Actors/text()" 2> /dev/null`
+    actores="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Actors/text()" 2> /dev/null`;')"
     echo "actores: $actores" | tee -a "${i%nfo}txt"
     #actores=`echo $actoresXP |sed -e 's/^<.*>\([^<].*\)<.*>$/\1/'`
 
     #Género de la serie
-    genero=`xpath "$xml" "//Genre/text()" 2> /dev/null`
+    #genero=`xpath "$xml" "//Genre/text()" 2> /dev/null`
+    genero="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Genre/text()" 2> /dev/null`;')"
     echo "genero: $genero" | tee -a "${i%nfo}txt"
     #genero=`echo $generoXP |sed -e 's/^<.*>\([^<].*\)<.*>$/\1/'`
 
     #Sinopsis de la serie
     #Esta sinopsis aplica solamente si se trata de la primera temporada
-    sinopsis=`xpath "$xml" "//Series/Overview/text()" 2>/dev/null`
+    #sinopsis=`xpath "$xml" "//Series/Overview/text()" 2>/dev/null`
+    sinopsis="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Series/Overview/text()" 2> /dev/null`;')"
     echo "sinopsis: $sinopsis" | tee -a "${i%nfo}txt"
     #sinopsis=`echo $sinopsisXP |sed -e 's/^<.*>\([^<].*\)<.*>$/\1/'`
 
     #Canal en donde transmiten la serie
-    network=`xpath "$xml" "//Series/Network/text()" 2>/dev/null`
+    #network=`xpath "$xml" "//Series/Network/text()" 2>/dev/null`
+    network="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Series/Network/text()" 2> /dev/null`;')"
     echo "network: $network" | tee -a "${i%nfo}txt"
 
     #Tipo de contenido multimedia
     mediakind="TV Show"
     echo "contenido: $mediakind" | tee -a "${i%nfo}txt"
 
-    contentrating="$(xpath "$xml" '//Series/ContentRating/text()' 2> /dev/null)"
+    #contentrating="$(xpath '"$xml"' '//Series/ContentRating/text()' 2> /dev/null)"
+    contentrating="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Series/ContentRating/text()" 2> /dev/null`;')"
+
     echo "rating: $contentrating" | tee -a "${i%nfo}txt"
 
     #boolean si el contenido es HD
@@ -398,30 +409,40 @@ find "$DIR" -type f -name "$NFO" -print0 | while IFS= read -r -d '' i; do
 
     echo "poster: $portada" | tee -a "${i%nfo}txt"
 
-    let episodios="$(xpath "$xml" 'count(//Episode)' 2> /dev/null)"
+    #let episodios="$(xpath "$xml" 'count(//Episode)' 2> /dev/null)"
+    let episodios="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "count(//Episode)" 2> /dev/null`;')"
 
     for j in $(seq 1 "$episodios"); do
 
-        tempo="$(xpath "$xml" '//Episode['$j']/SeasonNumber/text()' 2> /dev/null)"
-        episo="$(xpath "$xml" '//Episode['$j']/EpisodeNumber/text()' 2> /dev/null)"
+        #tempo="$(xpath "$xml" '//Episode['$j']/SeasonNumber/text()' 2> /dev/null)"
+        tempo="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Episode['$j']/SeasonNumber/text()" 2> /dev/null`;')"
+        #episo="$(xpath "$xml" '//Episode['$j']/EpisodeNumber/text()' 2> /dev/null)"
+        episo="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Episode['$j']/EpisodeNumber/text()" 2> /dev/null`;')"
 
         if [ $tempo = $NUMTEM ]; then
 
             if [ $episo = $NUMEPI ]; then
 
-                temporada="$(xpath "$xml" '//Episode['$j']/SeasonNumber/text()' 2> /dev/null)"
+                #temporada="$(xpath "$xml" '//Episode['$j']/SeasonNumber/text()' 2> /dev/null)"
+                temporada="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Episode['$j']/SeasonNumber/text()" 2> /dev/null`;')"
                 echo "temporada: $temporada" | tee -a "${i%nfo}txt"
-                episodio="$(xpath "$xml" '//Episode['$j']/EpisodeNumber/text()' 2> /dev/null)"
+                #episodio="$(xpath "$xml" '//Episode['$j']/EpisodeNumber/text()' 2> /dev/null)"
+                episodio="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Episode['$j']/EpisodeNumber/text()" 2> /dev/null`;')"
                 echo "episodio: $episodio" | tee -a "${i%nfo}txt"
-                nombre="$(xpath "$xml" '//Episode['$j']/EpisodeName/text()' 2> /dev/null)"
+                #nombre="$(xpath "$xml" '//Episode['$j']/EpisodeName/text()' 2> /dev/null)"
+                nombre="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Episode['$j']/EpisodeName/text()" 2> /dev/null`;')"
                 echo "nombre: $nombre" | tee -a "${i%nfo}txt"
-                overview="$(xpath "$xml" '//Episode['$j']/Overview/text()' 2> /dev/null)"
+                #overview="$(xpath "$xml" '//Episode['$j']/Overview/text()' 2> /dev/null)"
+                overview="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Episode['$j']/Overview/text()" 2> /dev/null`;')"
                 echo "overview: $overview" | tee -a "${i%nfo}txt"
-                director="$(xpath "$xml" '//Episode['$j']/Director/text()' 2> /dev/null)"
+                #director="$(xpath "$xml" '//Episode['$j']/Director/text()' 2> /dev/null)"
+                director="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Episode['$j']/Director/text()" 2> /dev/null`;')"
                 echo "director: $director" | tee -a "${i%nfo}txt"
-                fecha="$(xpath "$xml" '//Episode['$j']/FirstAired/text()' 2> /dev/null)"
+                #fecha="$(xpath "$xml" '//Episode['$j']/FirstAired/text()' 2> /dev/null)"
+                fecha="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Episode['$j']/FirstAired/text()" 2> /dev/null`;')"
                 echo "fecha: $fecha" | tee -a "${i%nfo}txt"
-                episodeid="$(xpath "$xml" '//Episode['$j']/id/text()' 2> /dev/null)"
+                #episodeid="$(xpath "$xml" '//Episode['$j']/id/text()' 2> /dev/null)"
+                episodeid="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Episode['$j']/id/text()" 2> /dev/null`;')"
                 echo "episodioId: $episodeid" | tee -a "${i%nfo}txt"
 
             fi
@@ -444,9 +465,10 @@ find "$DIR" -type f -name "$FILES" -print0 | while IFS= read -r -d '' i; do
     mp4final="${mp4final%.*}.$NEWEXT"
     mp4final="$DIR$mp4final"
 
-    metaNombre=`echo ${i%mkv}txt |sed -e 's/ -.*//g'`
+    metaNombre=$(basename "$i")
+    metaNombre=`echo ${metaNombre%mkv}txt |sed -e 's/ -.*//g'`
     metaEpi=`echo ${i%mkv}txt |sed -e 's/.*\(..x..\).*/\1/' -e 's/ //'`
-    meta="$metaNombre.$metaEpi.txt"
+    meta="$DIR/$metaNombre.$metaEpi.txt"
 
     nombreSerie=`cat "$meta" |grep serie: |sed -e 's/serie: //'`
     actores=`cat "$meta" |grep actores: |sed -e 's/actores: //'`
@@ -467,7 +489,7 @@ find "$DIR" -type f -name "$FILES" -print0 | while IFS= read -r -d '' i; do
 
     #-metadata:s:s:[stream number] language=[language code]
     # -c:a aac -ac 2 -strict -2 #cambio el audio a AAC Stereo
-    ffmpeg -i "${i%.#*}" -i "${i%.*}.$SUBEXT" -map 0:0 -map 0:1 -map 1:0 -c:v copy -c:a aac -ac 2 -strict -2 -c:s mov_text \
+   ffmpeg -i "${i%.#*}" -i "${i%.*}.$SUBEXT" -map 0:0 -map 0:1 -map 1:0 -c:v copy -c:a aac -ac 2 -strict -2 -c:s mov_text \
         -metadata:s:s:0 language="spa" \
         -metadata:s:s:0 title="Spanish" \
         -metadata:s:a:0 language="eng" \
@@ -476,7 +498,11 @@ find "$DIR" -type f -name "$FILES" -print0 | while IFS= read -r -d '' i; do
         -metadata:s:v:0 title="English" \
         "${i%.*}.$NEWEXT" < /dev/null
 
-SublerCLI -source "${i%.*}.$NEWEXT" -dest "$mp4final" -metadata {"TV Show":"$nombreSerie"}{"Artwork":"$portada"}{"HD Video":"$hdvideo"}{"Media Kind":"$mediakind"}{"TV Episode #":"$episodio"}{"TV Season":"$temporada"}{"Genre":"$genero"}{"Name":"$nombre"}{"Artist":"$nombreSerie"}{"Album Artist":"$nombreSerie"}{"Album":"$nombreSerie"}{"Release Date":"$fecha"}{"TV Network":"$network"}{"TV Episode ID":"$episode_id"}
+    SublerCLI -source "${i%.*}.$NEWEXT" -dest "$mp4final" -metadata {"TV Show":"$nombreSerie"}{"Artwork":"$portada"}{"HD Video":"$hdvideo"}{"Media Kind":"$mediakind"}{"TV Episode #":"$episodio"}{"TV Season":"$temporada"}{"Genre":"$genero"}{"Name":"$nombre"}{"Artist":"$nombreSerie"}{"Album Artist":"$nombreSerie"}{"Album":"$nombreSerie"}{"Release Date":"$fecha"}{"TV Network":"$network"}{"TV Episode ID":"$episode_id"}{"Description":"$sinopsis"}{"Long Description":"$overview"}
+
+    #Movemos el video a iTunes
+    mv "$mp4final" "$itunes"
+
 done
 
 }
