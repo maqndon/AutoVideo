@@ -325,8 +325,11 @@ find "$DIR" -type f -name "$NFO" -print0 | while IFS= read -r -d '' i; do
     seriename=`xpath "$i" "(//SeriesName)[1]/text()" 2> /dev/null`
 
     #Número de temporada y de episodio
-    NUMTEM=`echo $i |sed -e 's/.*\.\([^x].*\)\..*/\1/' -e 's/x.*//' -e 's/0//'`
-    NUMEPI=`echo $i |sed -e 's/.*\(x..\).*/\1/' -e 's/x//' -e 's/0//'`
+    NUMTEM=`echo $i |sed -e 's/.* \([0-9]*[0-9]\).*/\1/'`
+    if [ $NUMTEM == '01' ]; then
+        $NUMTEM=`echo $NUMTEM |sed -e 's/0//'`
+    fi
+    NUMEPI=`echo $i |sed -e 's/.*\(x..\).*/\1/' -e 's/x//'`
 
     #Asignamos título al .zip
     TITULOZIP=`echo $(basename "$i")|sed -e 's/.nfo/.zip/' 2> /dev/null`
@@ -383,7 +386,6 @@ find "$DIR" -type f -name "$NFO" -print0 | while IFS= read -r -d '' i; do
     echo "contenido: $mediakind" | tee -a "${i%nfo}txt"
 
     contentrating="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Series/ContentRating/text()" 2> /dev/null`;')"
-
     echo "rating: $contentrating" | tee -a "${i%nfo}txt"
 
     #boolean si el contenido es HD
@@ -417,6 +419,7 @@ find "$DIR" -type f -name "$NFO" -print0 | while IFS= read -r -d '' i; do
                 echo "fecha: $fecha" | tee -a "${i%nfo}txt"
                 episodeid="$(perl -E 'binmode STDOUT, ":encoding(UTF-8)";print `xpath '"$xml"' "//Episode['$j']/id/text()" 2> /dev/null`;')"
                 echo "episodioId: $episodeid" | tee -a "${i%nfo}txt"
+                continue
 
             fi
 
@@ -438,7 +441,7 @@ find "$DIR" -type f -name "$FILES" -print0 | while IFS= read -r -d '' i; do
     mp4final="$DIR$mp4final"
 
     metaNombre=$(basename "$i")
-    metaNombre=`echo ${metaNombre%mkv}txt |sed -e 's/ -.*//g'`
+    metaNombre=`echo ${metaNombre%mkv}txt |sed -e 's/ -.*//g' -e 's/ /./g'`
     metaEpi=`echo ${i%mkv}txt |sed -e 's/.*\(..x..\).*/\1/' -e 's/ //'`
     meta="$DIR/$metaNombre.$metaEpi.txt"
 
