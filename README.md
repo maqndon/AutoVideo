@@ -8,6 +8,7 @@ GNU/Linux
 1. ffmpeg
 2. Java 8
 3. Filebot
+4. SublerCli
 
 Mac OSX
 
@@ -16,6 +17,7 @@ Mac OSX
 3. Homebrew
 4. Homebrew-Cask
 5. Filebot
+6. SublerCli
 
 ## Modo de Empleo
 
